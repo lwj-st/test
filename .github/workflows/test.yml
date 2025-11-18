@@ -1,0 +1,31 @@
+name: 测试pr
+
+on:
+  workflow_dispatch:
+
+jobs:
+  TestSetup:
+    runs-on: ubuntu-latest
+    outputs:
+      changed_files: ${{ steps.changed_files.outputs.changed_files }}
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        
+      - name: Get changed files
+        id: changed_files
+        run: |
+          echo "$GITHUB_EVENT_NAME"
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "TARGET BRANCH: ${{ github.event.pull_request.base.ref }} ${{ github.event.pull_request.base.sha }}"
+            echo "SOURCE BRANCH: ${{ github.event.pull_request.head.ref }} ${{ github.event.pull_request.head.sha }}"
+            FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+            echo $FILES
+          else
+            FILES=$(git diff --name-only ${{ github.event.before }}..${{ github.sha }})
+            echo $FILES
+          fi
+          echo "Changed files:"
+          echo $FILES
+          echo "$FILES"
+          echo "changed_files=$(echo "$FILES" | paste -sd ',' -)" >> $GITHUB_OUTPUT
