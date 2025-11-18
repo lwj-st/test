@@ -1,7 +1,7 @@
 name: 测试pr
 
 on:
-  workflow_dispatch:
+  # workflow_dispatch:
   push:
     branches:
       - main
@@ -19,6 +19,20 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Get changed files 0
+        id: changed-files
+        uses: tj-actions/changed-files@v47
+
+      - name: List all changed files
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          echo "ALL_CHANGED_FILES: $ALL_CHANGED_FILES"
+          echo "asdf"
+          for file in ${ALL_CHANGED_FILES}; do
+            echo "$file was changed"
+          done
 
       - name: Get changed files
         id: changed_files
